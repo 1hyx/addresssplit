@@ -15,8 +15,8 @@ def wechat_split(info, item):
             info['线上标识'] = '1'
             info['分割_1'] = '财付通委托扣款方式'
             if index == 0:
-                info['分割_2'] = item[index+(9-i):]
-                item = item[index+(9-i):]
+                info['分割_2'] = item[index+(10-i):]
+                item = item[index+(10-i):]
                 return flag, info, item
             else:
                 info['分割_2'] = item[:index]

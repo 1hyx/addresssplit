@@ -9,7 +9,7 @@ an address can be constructed by payment_channel, suffix, location with length l
 3. 地点信息省级行政区划在 province.txt (包含 xxx省和xxx 两种情况)
 4. 省会城市信息在center_city.txt（包含 xx市和xx 两种情况）
 5. 可能出现其他市的情况，随机组合字+"市"生成
-6. 设定字符串的长度为30，在完成生成之后最后进行截断，模拟报文过长被数据库截断的情形
+6. 设定字符串的长度为19，在完成生成之后最后进行截断，模拟报文过长被数据库截断的情形
 
 ps. 线上报文的格式规则  online trade has specific mod of address
     if online , use 1.2.3.4.5.6
@@ -37,9 +37,9 @@ suffix_list = pd.read_csv('../data/company_type.txt', header=None, encoding='gbk
 def generate_online_address(n):
     item_list = []
     for i in range(n):
-        if i%3 == 0:
+        if i % 3 == 0:
             item = choice(payment_channels)[0]+choice(sep_list)[0]+choice(province_list)[0]+choice(all_company_list)[0]\
-                   + choice(suffix_list)[0] + choice(center_city_list)[0]
+                   + choice(suffix_list)[0] + "XX分公司"
         else:
             item = choice(payment_channels)[0]+choice(sep_list)[0]+'('+choice(province_list)[0]+')'\
                    + choice(all_company_list)[0] + choice(suffix_list)[0]
@@ -50,12 +50,14 @@ def generate_online_address(n):
 def generate_offline_address(n):
     item_list = []
     for i in range(n):
-        if i % 50 == 0:
-            item = choice(province_list)[0] + choice(all_company_list)[0] + choice(suffix_list)[0] + \
-                   choice(center_city_list)[0]
+        if i % 2== 0:
+            item = choice(province_list)[0] + choice(all_company_list)[0] + choice(suffix_list)[0]
+        elif i % 3 == 0:
+            item = choice(all_company_list)[0] + '(' + choice(province_list)[0] + ')' + choice(suffix_list)[0]
+        elif i % 5 == 0:
+            item = choice(all_company_list)[0] + '(' + choice(center_city_list)[0] + ')' + choice(suffix_list)[0]
         else:
-            item = choice(all_company_list)[0] + '(' + choice(province_list)[0] + ')' + choice(suffix_list)[0] + \
-                   choice(center_city_list)[0]+choice(suffix_list)[0]
+            item = 'XX市' + choice(all_company_list)[0] + choice(suffix_list)[0]
         item_list.append(item)
     return item_list
 
@@ -72,5 +74,6 @@ def main_generate_address(ratio, total):
 
 if __name__ == '__main__':
     result = main_generate_address(0.6, 1000)
-    df = pd.DataFrame(result, columns=['names']).to_csv('../generate_materials/demo_names.txt', encoding='utf-8',
-                                                        index=None)
+    df = pd.DataFrame(result, columns=['names'])
+    df = df['names'].str.slice(stop=19)
+    df.to_csv('../generate_materials/demo_names.txt', encoding='utf-8',index=None)

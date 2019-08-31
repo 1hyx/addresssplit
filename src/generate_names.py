@@ -5,7 +5,7 @@ date: 2019/8/30
 用于生成不规则的交易地址
 to generate different kinds of address
 不规则地址的模式抽样, 有几种模式
-irregular address, concentrate several mods
+irregular address, conclude into several mods
 an address can be constructed by payment_channel, suffix, location with length less than 20
 1. 支付宝，支付宝外部商户，XX商户(,可能被替换为- ,),分隔符在sep.txt，交易平台信息在payment_channels.txt
 2. (地点)某省某市XX有限公司（有限公司可被替换为 公司 有限责任公司 信息公司 信息技术公司等，后缀在suffix.txt
@@ -76,18 +76,22 @@ def generate_offline_address(n):
 # use to control the amount of address and the ratio of online: offline
 # ratio := the amount of online: total
 # total := the amount of address for the function to generate
-def main_generate_address(ratio, total):
+def main_generate_address(ratio, total, result_path='../data/demo_names.txt', stop=20):
     n1 = int(total*ratio)
     n2 = total-n1
+    print('will generate {} online address and {} offline address'.format(n1, n2))
     item_list1 = generate_online_address(n1)
     item_list2 = generate_offline_address(n2)
     items = item_list1+item_list2
     random.shuffle(items)
-    return items
+    df = pd.DataFrame(items, columns=['names'])['names'].str.slice(stop=stop)
+    df.to_csv(result_path, encoding='utf-8', index=None)
+    print('{} address have been generated at {} '.format(total, result_path))
 
 
 if __name__ == '__main__':
-    result = main_generate_address(0.6, 1000)
-    df = pd.DataFrame(result, columns=['names'])
-    df = df['names'].str.slice(stop=20)
-    df.to_csv('../generate_materials/demo_names.txt', encoding='utf-8', index=None)
+    online_offline_ratio = 0.6
+    total_num = 1000
+    main_generate_address(online_offline_ratio, total_num)
+
+

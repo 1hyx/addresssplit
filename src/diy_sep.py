@@ -226,10 +226,10 @@ def main_split(file):
     df = pd.DataFrame(final_list)
     df = df[['origin', 'online_sign', 'province', 'city', 'name', 'management_type', 'bracket_content',
              'sep_first', 'sep_last']]
-    df.to_csv('../data/result.csv',  index=None)
+    df.to_csv('../generate_materials/result.csv',  index=None)
 
 
 if __name__ == '__main__':
-    file_path = '../data/demo_names.txt'
+    file_path = '../generate_materials/demo_names.txt'
     main_split(file_path)
 

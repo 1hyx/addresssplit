@@ -44,8 +44,8 @@ def main_cut_suffix(file_path, col_name):
 
 
 if __name__ == '__main__':
-    path = '../data/result.csv'
-    result_path = '../data/rest_names.txt'
+    path = '../generate_materials/result.csv'
+    result_path = '../generate_materials/rest_names.txt'
     col = 'name'
     final_data = main_cut_suffix(path, col)
     final_df = pd.DataFrame(final_data, columns=['rest_name']).to_csv(result_path, encoding='utf-8', index=None)

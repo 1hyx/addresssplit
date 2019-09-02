@@ -76,7 +76,7 @@ def generate_offline_address(n):
 # use to control the amount of address and the ratio of online: offline
 # ratio := the amount of online: total
 # total := the amount of address for the function to generate
-def main_generate_address(ratio, total, result_path='../data/demo_names.txt', stop=20):
+def main_generate_address(ratio, total, result_path='../generate_materials/demo_names.txt', stop=20):
     n1 = int(total*ratio)
     n2 = total-n1
     print('will generate {} online address and {} offline address'.format(n1, n2))

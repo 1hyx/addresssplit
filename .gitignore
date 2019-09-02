@@ -106,3 +106,6 @@ venv.bak/
 .mypy_cache/
 
 .idea/workspace.xml
+data/demo_names.txt
+data/rest_names.txt
+data/result.csv

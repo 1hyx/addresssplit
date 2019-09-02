@@ -105,6 +105,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+.idea
 .idea/workspace.xml
 data/demo_names.txt
 data/rest_names.txt

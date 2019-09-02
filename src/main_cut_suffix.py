@@ -7,6 +7,7 @@ cut several suffice to obtain unique names
 """
 import pandas as pd
 
+
 suffix_without_list = pd.read_csv('../data/suffix_without.txt', encoding='gbk', header=None).values.tolist()
 suffix_within_list = pd.read_csv('../data/suffix_within.txt', header=None).values.tolist()
 
@@ -30,22 +31,26 @@ def cut_suffix_without(item):
     return 0, item
 
 
-def main_cut_suffix(file_path, col_name):
-    names = pd.read_csv(file_path, dtype=str)[col_name].values.tolist()
+def main_cut_suffix(file, col_name, result_folder, result_name):
+    if type(file) == str:
+        names = pd.read_csv(file, dtype=str)[col_name].values.tolist()
+    else:
+        names = file
+    result_path = result_folder + result_name
     result = []
-    for name in names:
+    n = len(names)
+    for i, name in enumerate(names):
         flag1, rest1 = cut_suffix_within(str(name))
         flag2, rest2 = cut_suffix_without(str(name))
         if flag1:
             result.append(rest1)
         else:
             result.append(rest2)
-    return result
-
-
-if __name__ == '__main__':
-    path = '../generate_materials/result.csv'
-    result_path = '../generate_materials/rest_names.txt'
-    col = 'name'
-    final_data = main_cut_suffix(path, col)
-    final_df = pd.DataFrame(final_data, columns=['rest_name']).to_csv(result_path, encoding='utf-8', index=None)
+        if i + 1 == n:
+            percent = 100.0
+            print('当前核算进度 : %s [%d/%d]' % (str(percent) + '%', i + 1, n), end='\n')
+        else:
+            percent = round(1.0 * i / n * 100, 2)
+            print('当前核算进度 : %s [%d/%d]' % (str(percent) + '%', i + 1, n), end='\r')
+    final_df = pd.DataFrame(result, columns=['rest_name']).to_csv(result_path, encoding='utf-8', index=None)
+    return result_path

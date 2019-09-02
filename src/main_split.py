@@ -191,10 +191,14 @@ def city_split(info, item):
         return info, item
 
 
-def main_split(file):
-    names = pd.read_csv(file, dtype=str).values.tolist()
+def main_split(file, result_folder, result_name):
+    if type(file) == str:
+        names = pd.read_csv(file, dtype=str, header=None).values.tolist()
+    else:
+        names = file
     final_list = []
-    for name in names:
+    n = len(names)
+    for i, name in enumerate(names):
         name_in_use = name[0]
         res0 = {'origin': name_in_use}
         flag1, res1, item1 = sep_middle(res0, name[0])
@@ -223,13 +227,15 @@ def main_split(file):
             res4, name4 = city_split(res3, name3)
             res4['name'] = name4
             final_list.append(res4)
+        if i + 1 == n:
+            percent = 100.0
+            print('当前核算进度 : %s [%d/%d]' % (str(percent) + '%', i + 1, n), end='\n')
+        else:
+            percent = round(1.0 * i / n * 100, 2)
+            print('当前核算进度 : %s [%d/%d]' % (str(percent) + '%', i + 1, n), end='\r')
     df = pd.DataFrame(final_list)
+    result_path = result_folder + result_name
     df = df[['origin', 'online_sign', 'province', 'city', 'name', 'management_type', 'bracket_content',
              'sep_first', 'sep_last']]
-    df.to_csv('../generate_materials/result.csv',  index=None)
-
-
-if __name__ == '__main__':
-    file_path = '../generate_materials/demo_names.txt'
-    main_split(file_path)
-
+    df.to_csv(result_path,  index=None)
+    return result_path

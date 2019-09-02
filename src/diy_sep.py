@@ -3,7 +3,7 @@ author: hu yuxin
 date: 2019/8/28
 
 用于分隔中国收费系统中常见的地址栏信息的规则分词
-Use to Separate the words of detailed address information, to get key words of different kinds of stores or companies
+Use to Separate the words of detailed address information from China bank system, to get key words of different kinds of stores or companies
 
 数据说明：
 Data description:
@@ -26,7 +26,7 @@ all provinces in China
 中国所有省会城市名
 all provincial capital in China
 对应的补完方式对应(自己设计)
-the collection for incomplete —> complete（diy）
+the collection for incomplete —> complete couples（diy）
 公司或店铺经营类型的后缀(自己收集)
 the suffice of company and store to imply the management types（collected by myself）
 
@@ -77,10 +77,10 @@ company_list = pd.read_csv('../data/company_type.txt', header=None, encoding='gb
 def sep_middle(info, item):
     titles = ['sep_first', 'sep_last']
     for sep in sep_list:
-        index_ = item.find(sep, 0)
+        index_ = item.find(sep[0], 0)
         if index_ != -1:
             info['online_sign'] = '1'
-            items = item.split(sep)
+            items = item.split(sep[0])
             info[titles[0]] = items[0]
             info[titles[1]] = items[-1]
             rest = items[-1]
@@ -107,8 +107,8 @@ def part_company(info, item):
 
 # # 括号分割,将括号中的内容取出，并合并字符，考虑只有左括号的情形
 def sep_brackets(info, item):
-    index_right = item.find('）', 0)
-    index_left = item.find('（', 0)
+    index_right = item.find(')', 0)
+    index_left = item.find('(', 0)
     if index_right != -1:
         info['bracket_content'] = item[index_left+1:index_right]
         item = item[0:index_left]+item[index_right+1:]
@@ -191,17 +191,17 @@ def city_split(info, item):
         return info, item
 
 
-def main_split(file_path):
-    names = pd.read_csv(file_path, dtype=str, encoding='gbk', header=None, engine='python').values.tolist()
+def main_split(file):
+    names = pd.read_csv(file, dtype=str).values.tolist()
     final_list = []
     for name in names:
-        print(name)
         name_in_use = name[0]
         res0 = {'origin': name_in_use}
         flag1, res1, item1 = sep_middle(res0, name[0])
         # flag2, res2, item2 = wechat_split(res0, name[0])
         if flag1 == 1:
             res_new, rest = part_company(res1, item1)
+            res_new, rest = sep_brackets(res_new, rest)
             res_new1, rest1 = geography_split(res_new, rest)
             res_new2, rest2 = center_city_split(res_new1, rest1)
             res_final, rest_final = city_split(res_new2, rest2)
@@ -222,7 +222,6 @@ def main_split(file_path):
             res3, name3 = company_split(res21, name21)
             res4, name4 = city_split(res3, name3)
             res4['name'] = name4
-            print(res4)
             final_list.append(res4)
     df = pd.DataFrame(final_list)
     df = df[['origin', 'online_sign', 'province', 'city', 'name', 'management_type', 'bracket_content',
@@ -231,6 +230,6 @@ def main_split(file_path):
 
 
 if __name__ == '__main__':
-    file_path = ''
+    file_path = '../data/demo_names.txt'
     main_split(file_path)
 

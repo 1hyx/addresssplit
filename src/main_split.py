@@ -1,5 +1,5 @@
 """
-author: hu yuxin
+author: huyuxin
 date: 2019/8/28
 
 用于分隔中国收费系统中常见的地址栏信息的规则分词
@@ -50,27 +50,27 @@ part_full_df = pd.read_csv('../data/part_company.txt', header=None, encoding='gb
 company_list = pd.read_csv('../data/company_type.txt', header=None, encoding='gbk').values.tolist()
 
 
-# # 字符过多，财付通分割
-# def wechat_split(info, item):
-#     wechat_list = ['财付通委托扣款方式', '财付通委托扣款方', '财付通委托扣款', '财付通委托扣', '财付通委托', '财付通委',
-#                    '财付通', '财付']
-#     for i, we in enumerate(wechat_list):
-#         flag = 0
-#         index = item.find(we, 0)
-#         if index != -1:
-#             flag = 1
-#             info['线上标识'] = '1'
-#             info['分割_1'] = '财付通委托扣款方式'
-#             if index == 0:
-#                 info['分割_2'] = item[index+(10-i):]
-#                 item = item[index+(10-i):]
-#                 return flag, info, item
-#             else:
-#                 info['分割_2'] = item[:index]
-#                 item = item[:index]
-#                 return flag, info, item
-#     else:
-#         return flag, info, item
+# 字符过多，财付通分割
+def wechat_split(info, item):
+    wechat_list = ['财付通委托扣款方式', '财付通委托扣款方', '财付通委托扣款', '财付通委托扣', '财付通委托', '财付通委',
+                   '财付通', '财付']
+    for i, we in enumerate(wechat_list):
+        flag = 0
+        index = item.find(we, 0)
+        if index != -1:
+            flag = 1
+            info['online_sign'] = '1'
+            info['sep_first'] = '财付通委托扣款方式'
+            if index == 0:
+                info['sep_last'] = item[index+(10-i):]
+                item = item[index+(10-i):]
+                return flag, info, item
+            else:
+                info['sep_last'] = item[:index]
+                item = item[:index]
+                return flag, info, item
+    else:
+        return flag, info, item
 
 
 # 特殊字符分割
@@ -172,7 +172,7 @@ def center_city_split(info, item):
 # 非省会非省地理信息切割
 # 排除市本身的词汇情况：市区
 def city_split(info, item):
-    special = ['市区', '市民', '超市']
+    special = ['市区', '市民', '超市', '城市']
     f = 0
     for spe in special:
         pre_index = item.find(spe)
@@ -202,7 +202,7 @@ def main_split(file, result_folder, result_name):
         name_in_use = name[0]
         res0 = {'origin': name_in_use}
         flag1, res1, item1 = sep_middle(res0, name[0])
-        # flag2, res2, item2 = wechat_split(res0, name[0])
+        flag2, res2, item2 = wechat_split(res0, name[0])
         if flag1 == 1:
             res_new, rest = part_company(res1, item1)
             res_new, rest = sep_brackets(res_new, rest)
@@ -211,14 +211,14 @@ def main_split(file, result_folder, result_name):
             res_final, rest_final = city_split(res_new2, rest2)
             res_final['name'] = rest_final
             final_list.append(res_final)
-        # elif flag2 == 1:
-        #     res_new, rest = part_company(res2, item2)
-        #     res_new1, rest1 = geography_split(res_new, rest)
-        #     res_new2, rest2 = center_city_split(res_new1, rest1)
-        #     res_final, rest_final = city_split(res_new2, rest2)
-        #     res_final['name'] = rest_final
-        #     print(res_final)
-        #     final_list.append(res_final)
+        elif flag2 == 1:
+            res_new, rest = part_company(res2, item2)
+            res_new1, rest1 = geography_split(res_new, rest)
+            res_new2, rest2 = center_city_split(res_new1, rest1)
+            res_final, rest_final = city_split(res_new2, rest2)
+            res_final['name'] = rest_final
+            print(res_final)
+            final_list.append(res_final)
         else:
             res1, name1 = sep_brackets(res0, name_in_use)
             res2, name2 = geography_split(res1, name1)

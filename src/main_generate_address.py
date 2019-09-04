@@ -1,5 +1,5 @@
 """
-author: hu yuxin
+author: huyuxin
 date: 2019/8/30
 
 用于生成不规则的交易地址

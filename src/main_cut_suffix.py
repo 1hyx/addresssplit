@@ -1,4 +1,5 @@
-# __*_ coding:utf-8 _*_
+# _*_ coding:utf-8 _*_
+# _author_ = huyuxin
 """
 在信息切割之后，需要整理出唯一性信息，做成字典
 After the split of different type of information from every each of the address the rest still has useless words
@@ -52,5 +53,5 @@ def main_cut_suffix(file, col_name, result_folder, result_name):
         else:
             percent = round(1.0 * i / n * 100, 2)
             print('当前核算进度 : %s [%d/%d]' % (str(percent) + '%', i + 1, n), end='\r')
-    final_df = pd.DataFrame(result, columns=['rest_name']).to_csv(result_path, encoding='utf-8', index=None)
+    pd.DataFrame(result, columns=['rest_name']).to_csv(result_path, encoding='utf-8', index=None)
     return result_path
